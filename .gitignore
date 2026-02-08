@@ -1,0 +1,11 @@
+.vs
+**/__pycache__/**
+**.pyc
+logs/
+test_*
+python-*
+**/x64/**
+**/include/**
+**/lib/**
+downloadIPC.exe
+config.json
