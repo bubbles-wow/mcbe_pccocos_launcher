@@ -66,7 +66,11 @@ class DownloaderGUI:
 
     def fetch_latest_version(self):
         self.log(self.texts['checking_version'])
-        self.set_controls_state(False)
+        # self.set_controls_state(False)
+        if getattr(self, 'check_version_btn', None):
+            self.check_version_btn.config(state='disabled')
+        if getattr(self, 'start_button', None):
+            self.start_button.config(state='disabled')
             
         def task():
             try:

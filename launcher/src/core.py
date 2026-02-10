@@ -175,7 +175,7 @@ class DownloaderCore:
         if self.manifest_thread and self.manifest_thread.is_alive():
             return
             
-        self.log("Starting manifest server thread (daemon)...")
+        self.log("Starting manifest server...")
         try:
             from manifest_server import app as manifest_app
             from werkzeug.serving import make_server
@@ -193,7 +193,7 @@ class DownloaderCore:
     def start_zmq_server(self):
         if self.server_thread and self.server_thread.is_alive():
             return
-        self.log("Starting ZMQ server thread (daemon)...")
+        self.log("Starting ZMQ server...")
         self.server_thread = threading.Thread(target=self.run_zmq_server, daemon=True)
         self.server_thread.start()
 
@@ -215,11 +215,12 @@ class DownloaderCore:
         try:
             while not self.stop_event.is_set():
                 if self.ipc_stop_requested.is_set():
+                    self.ipc_stop_requested.clear()
                     if self.last_cid:
                         pub_sock.send_multipart([self.last_cid, b"3"])
                         pub_sock.send_multipart([self.last_cid, b"3"])
-                        self.log("Sent IPC stop request via ZMQ.")
-                    self.ipc_stop_requested.clear()
+                        self.log("Sent stop signal to IPC via ZMQ.")
+                        return
 
                 socks = dict(poller.poll(timeout=100))
                 if sub_sock in socks:
@@ -246,13 +247,15 @@ class DownloaderCore:
                     if 8 <= m_type < 2000:
                         pub_sock.send_multipart([cid, b"3"])
                         pub_sock.send_multipart([cid, b"3"])
-                        self.log(f"End signal received (Type: {m_type})")
+                        self.log(f"Received stop signal from IPC (type {m_type})")
+                        return
         except Exception as e:
             self.log(f"ZMQ Server Error: {e}")
         finally:
             sub_sock.close()
             pub_sock.close()
             ctx.term()
+            self.log("ZMQ server stopped.")
 
     def start_download(self, on_finished_callback=None):
         self.stop_event.clear()
@@ -286,11 +289,11 @@ class DownloaderCore:
         param["path"] = encode_path(param.get("path", ""))
         param["repairListPath"] = encode_path(param.get("repairListPath", ""))
         
-        cmd = [exe_path]
+        cmd = [str(exe_path)]
         for k, v in param.items():
             cmd.append(f"--{k}:{v}")
             
-        self.log(f"Starting binary: {os.path.basename(exe_path)}")
+        self.log(f"Starting command: {' '.join(cmd)}")
         
         self.process = subprocess.Popen(
             cmd, 
@@ -304,9 +307,9 @@ class DownloaderCore:
         
         stdout, stderr = self.process.communicate()
         if self.process.returncode != 0:
-            self.log(f"Process error (code {self.process.returncode}): {stderr}")
+            self.log(f"Process downloadIPC.exe error (code {self.process.returncode}): {stderr}")
         else:
-            self.log("Binary executed successfully.")
+            self.log("Process downloadIPC.exe stopped.")
         self.process = None
         
     def launch_game(self):
