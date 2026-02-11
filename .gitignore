@@ -7,5 +7,4 @@ python-*
 **/x64/**
 **/include/**
 **/lib/**
-downloadIPC.exe
 config.json
