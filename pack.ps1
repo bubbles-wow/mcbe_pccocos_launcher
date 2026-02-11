@@ -95,7 +95,7 @@ foreach ($dir in $dirs) {
 # Remove test pyd in DLLs
 $pydFiles = Get-ChildItem -Path $dllPath -Filter "*.pyd"
 foreach ($pyd in $pydFiles) {
-    if ($pyd.Name -like "_test*") {
+    if ($pyd.Name -like "_test*" -or $pyd.Name -eq "_ctypes_test.pyd") {
         Write-Host "Removing test pyd: $($pyd.FullName)" -ForegroundColor Yellow
         Remove-Item -Path $pyd.FullName -Force
     }
@@ -183,7 +183,7 @@ Move-Item -Path (Join-Path -Path $PY_ROOT -ChildPath "site-packages") -Destinati
 $tclPath = Join-Path -Path $PY_ROOT -ChildPath "tcl"
 if (Test-Path $tclPath) {
     foreach ($item in Get-ChildItem -Path $tclPath) {
-        if ($item.Name -like "tcl*" -or $item.Name -like "tk*") {
+        if ($item.PSIsContainer -and ($item.Name -like "tcl*" -or $item.Name -like "tk*")) {
             Move-Item -Path $item.FullName -Destination $dllPath -Force
         }
         Write-Host "Moving tcl item: $($item.FullName)" -ForegroundColor Yellow
