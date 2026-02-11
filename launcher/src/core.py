@@ -84,7 +84,7 @@ class DownloaderCore:
             "state_flag": flag,
             "origin_v": self.download_config.originVersion,
             "target_v": self.download_config.targetVersion,
-            "is_interrupted": 2 <= flag < 8,
+            "is_interrupted": 2 < flag < 8,
             "is_repair_mode": False,
             "repair_files": []
         }
@@ -293,7 +293,7 @@ class DownloaderCore:
         for k, v in param.items():
             cmd.append(f"--{k}:{v}")
             
-        self.log(f"Starting command: {' '.join(cmd)}")
+        self.log(f"Starting downloader... ({' '.join(cmd)})")
         
         self.process = subprocess.Popen(
             cmd, 

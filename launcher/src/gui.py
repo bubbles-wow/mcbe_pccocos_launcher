@@ -104,6 +104,8 @@ class DownloaderGUI:
         executor.submit(task)
         
     def check_path(self):
+        if self.game_config.path.strip() == "":
+            self.browse_path()
         analysis = self.core.detect_local_state()
         if analysis:
             if analysis['origin_v']:
@@ -288,7 +290,7 @@ class DownloaderGUI:
             self.start_button.config(state='normal')
 
     def browse_path(self):
-        dir_path = filedialog.askdirectory()
+        dir_path = filedialog.askdirectory(title=self.texts['select_path_title'])
         if dir_path:
             self.path_var.set(dir_path)
             self.check_path()

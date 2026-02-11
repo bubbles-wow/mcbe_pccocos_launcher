@@ -44,7 +44,8 @@ I18N = {
         'check_progress': '{curr} / {total} ( {percent:.1f}% )',
         'progress_format': '{percent:.1f}% ( {rate} ) - {status}',
         'update_confirm_title': '发现新版本',
-        'update_confirm_msg': '检测到新版本，是否立即下载更新？'
+        'update_confirm_msg': '检测到新版本，是否立即下载更新？',
+        'select_path_title': '选择下载路径'
     },
     'en': {
         'title': 'MCBedrock Downloader GUI',
@@ -90,6 +91,7 @@ I18N = {
         'check_progress': '{curr} / {total} ( {percent:.1f}% )',
         'progress_format': '{percent:.1f}% ( {rate} ) - {status}',
         'update_confirm_title': 'New Version Found',
-        'update_confirm_msg': 'New version detected. Do you want to download and update now?'
+        'update_confirm_msg': 'New version detected. Do you want to download and update now?',
+        'select_path_title': 'Select Download Path'
     }
 }
