@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Build python
         id: build-python
@@ -36,7 +36,7 @@ jobs:
           echo "name=$targetPath" >> $GITHUB_OUTPUT
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ steps.pack.outputs.name }}
           path: ${{ steps.pack.outputs.name }}
