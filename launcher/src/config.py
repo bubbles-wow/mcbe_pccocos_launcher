@@ -62,7 +62,7 @@ class ConfigWrapper(BaseEntity):
             with open(path, 'r', encoding='utf-8') as f:
                 data: dict = json.load(f)
                 config.appConfig.update(data.get("appConfig", {}))
-                config.downloadConfig.update(data.get("downloadIpcConfig", {}))
+                config.downloadConfig.update(data.get("downloadConfig", {}))
                 config.gameConfig.update(data.get("gameConfig", {}))
         except Exception as e:
             logging.error(f"Failed to load config: {e}")
@@ -71,7 +71,7 @@ class ConfigWrapper(BaseEntity):
     def save(self):
         save_config = {
             "appConfig": self.appConfig.to_save_dict(),
-            "downloadIpcConfig": self.downloadConfig.to_save_dict(),
+            "downloadConfig": self.downloadConfig.to_save_dict(),
             "gameConfig": self.gameConfig.to_save_dict()
         }
         
