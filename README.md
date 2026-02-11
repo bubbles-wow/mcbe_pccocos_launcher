@@ -41,7 +41,7 @@ mcbe基岩互通版启动器
     1. `appConfig`: 启动器配置项
         - `silentMode`: 是否启用无 GUI 模式，启用后将直接启动游戏，不显示启动器界面。有更新时会弹窗确认是否更新。
         - `autoUpdate`: 是否启用自动更新，启用后在有更新时会自动进行下载。
-    2. `downloadIpcConfig`: 下载器配置项
+    2. `downloadConfig`: 下载器配置项
         - `isSSD`: 是否安装在SSD上，1表示是，0表示否
         - `rateLimit`: 下载速度限制，单位为KB/s，0表示不限制
     3. `gameConfig`: 游戏配置项（不要手动修改，会根据游戏目录进行识别）
