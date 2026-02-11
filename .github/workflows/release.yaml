@@ -7,10 +7,16 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Set up MSVC x64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          toolset: '14.5'
+          arch: amd64
 
       - name: Build python
         id: build-python
@@ -29,11 +35,24 @@ jobs:
         id: pack
         shell: pwsh
         run: |
-          $newName = "mcbe-pccocos-launcher-v${{ github.ref_name }}"
-          Rename-Item -Path "python-embed" -NewName $newName
+          $refName = "${{ github.ref_name }}"
+          if ("${{ github.ref_type }}" -ne "tag") {
+              $date = Get-Date -Format "yyyyMMdd-HHmm"
+              $version = "dev-$date"
+          } else {
+              $version = $refName
+          }
+          $newName = "mcbe-pccocos-launcher-$version"
+          
+          if (Test-Path "python-embed") {
+              # 防止因重名目录导致重命名失败
+              if (Test-Path $newName) { Remove-Item $newName -Recurse -Force }
+              Rename-Item -Path "python-embed" -NewName $newName
+          }
+          
           $targetPath = "$newName.zip"
           7z a -tzip $targetPath $newName
-          echo "name=$targetPath" >> $GITHUB_OUTPUT
+          "name=$targetPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
@@ -50,4 +69,4 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: ${{ steps.pack.outputs.name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
