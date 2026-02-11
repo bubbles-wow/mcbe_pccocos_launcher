@@ -1,0 +1,53 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build python
+        id: build-python
+        shell: pwsh
+        run: |
+          ./init.ps1
+          ./pack.ps1
+      
+      - name: Build cpp
+        id: build-cpp
+        shell: pwsh
+        run: |
+          ./build.ps1
+
+      - name: Prepare artifact
+        id: pack
+        shell: pwsh
+        run: |
+          $newName = "mcbe-pccocos-launcher-v${{ github.ref_name }}"
+          Rename-Item -Path "python-embed" -NewName $newName
+          $targetPath = "$newName.zip"
+          7z a -tzip $targetPath $newName
+          echo "name=$targetPath" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.pack.outputs.name }}
+          path: ${{ steps.pack.outputs.name }}
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: ${{ steps.pack.outputs.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
