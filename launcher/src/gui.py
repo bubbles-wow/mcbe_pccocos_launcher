@@ -106,6 +106,7 @@ class DownloaderGUI:
     def check_path(self):
         if self.game_config.path.strip() == "":
             self.browse_path()
+            return
         analysis = self.core.detect_local_state()
         if analysis:
             if analysis['origin_v']:

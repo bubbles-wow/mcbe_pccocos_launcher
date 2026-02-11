@@ -52,7 +52,7 @@ jobs:
           
           $targetPath = "$newName.zip"
           7z a -tzip $targetPath $newName
-          "name=$targetPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "name=$newName" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
@@ -67,6 +67,6 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: ${{ steps.pack.outputs.name }}
+          files: ${{ steps.pack.outputs.name }}.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
