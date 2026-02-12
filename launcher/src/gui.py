@@ -31,7 +31,7 @@ class DownloaderGUI:
             self.root.withdraw()
         else:
             self.root.title(self.texts['title'])
-            self.root.geometry("1024x768")
+            self.center_window(1024, 768)
             self.create_widgets()
             
         # 0: ready, 1: downloading, 2: checking
@@ -43,6 +43,13 @@ class DownloaderGUI:
         self.root.after(0, self.check_path)
         
         self.root.after(2000, self.monitor_game_status)
+
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def set_controls_state(self, enabled: bool):
         state = 'normal' if enabled else 'disabled'
@@ -325,7 +332,7 @@ class DownloaderGUI:
         
         self.progress_frame.grid(row=0, column=0, sticky='nsew', padx=15, pady=20)
         self.root.title(f"{self.texts['title']} - Progress")
-        self.root.geometry("1024x220")
+        self.center_window(1024, 220)
         self.root.deiconify()
 
     def exit_and_launch(self):
