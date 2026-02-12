@@ -24,7 +24,8 @@ mcbe基岩互通版启动器
     {
         "appConfig": {
             "silentMode": false,
-            "autoUpdate": false
+            "autoUpdate": false,
+            "unlimitLaunchGame": false
         },
         "downloadConfig": {
             "isSSD": 1,
@@ -41,6 +42,7 @@ mcbe基岩互通版启动器
     1. `appConfig`: 启动器配置项
         - `silentMode`: 是否启用无 GUI 模式，启用后将直接启动游戏，不显示启动器界面。有更新时会弹窗确认是否更新。
         - `autoUpdate`: 是否启用自动更新，启用后在有更新时会自动进行下载。
+        - `unlimitLaunchGame`: 是否允许多开游戏，启用后可以同时打开多个游戏实例。**本功能使用了 `version.dll` 注入实现，可能存在风险，请谨慎使用。**
     2. `downloadConfig`: 下载器配置项
         - `isSSD`: 是否安装在SSD上，1表示是，0表示否
         - `rateLimit`: 下载速度限制，单位为KB/s，0表示不限制
