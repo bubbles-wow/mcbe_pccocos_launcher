@@ -340,6 +340,7 @@ class DownloaderCore:
             tmp.write("\n".join(repair_list))
             tmp_path = tmp.name
             
+        self.download_config.targetVersion = self.download_config.originVersion
         self.download_config.isRepairMode = 1
         self.download_config.repairListPath = tmp_path
 

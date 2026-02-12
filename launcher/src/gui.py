@@ -57,6 +57,14 @@ class DownloaderGUI:
                     widget.config(state=state)
                 except Exception:
                     pass
+        if hasattr(self, 'start_button'):
+            try:
+                if self.download_config.originVersion == self.download_config.targetVersion:
+                    self.start_button.config(state='disabled')
+                else:
+                    self.start_button.config(state=state)
+            except Exception:
+                pass
         
         if enabled and hasattr(self, 'repair_button'):
             try:
@@ -424,6 +432,7 @@ class DownloaderGUI:
             self.show_compact_ui()
 
         self.version_var.set(self.download_config.originVersion)
+        self.download_config.targetVersion = self.download_config.originVersion
         self.set_controls_state(False)
         self.repair_button.config(text=self.texts['initializing'])
         
@@ -451,7 +460,7 @@ class DownloaderGUI:
         executor.submit(task)
 
     def _on_integrity_checked(self, repair_file_list):
-        self.log(self.texts['task_finished'])
+        self.progress_frame.grid_forget()
         if len(repair_file_list) == 0:
             messagebox.showinfo(self.texts['check_complete_title'], self.texts['check_intact_msg'])
             self.on_finished()
@@ -490,5 +499,5 @@ class DownloaderGUI:
         self.integrity_container.pack_forget()
         self.progress_frame.grid_forget()
         # Recheck local state to update UI
-        self.check_path()
+        # self.check_path()
         self.log(self.texts['task_finished'])
