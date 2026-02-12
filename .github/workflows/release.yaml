@@ -51,13 +51,14 @@ jobs:
           $libPath = "${{ github.workspace }}\version\lib"
           if (!(Test-Path $includePath)) { New-Item -ItemType Directory -Path $includePath }
           if (!(Test-Path $libPath)) { New-Item -ItemType Directory -Path $libPath }
-          Copy-Item -Path "build\minhook.x64.lib" -Destination $libPath\minhook.x64.lib -Force
-          Copy-Item -Path "include"\* -Destination $includePath -Force
+          Copy-Item -Path "build\Release\minhook.x64.lib" -Destination $libPath\minhook.x64.lib -Force
+          Copy-Item -Path "include\*" -Destination $includePath -Force
       
       - name: Build cpp
         id: build-cpp
         shell: pwsh
         run: |
+          cd ${{ github.workspace }}
           ./build.ps1
 
       - name: Prepare artifact
