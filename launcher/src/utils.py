@@ -1,6 +1,8 @@
 import os
 import json
 import time
+import shutil
+import logging
 import base64
 import hashlib
 import requests
@@ -21,8 +23,8 @@ def request_get(url: str, params: dict = None) -> dict:
             response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
             return response.json()
-        except requests.RequestException as e:
-            print(f"[!] Request failed: {e}")
+        except Exception as e:
+            logging.error(f"Request failed: {e}")
             time.sleep(i * 2)
 
 def parse_game_state(dir_path: Path, game_id: int):
@@ -36,7 +38,8 @@ def parse_game_state(dir_path: Path, game_id: int):
         with open(state_path, 'r') as f:
             state_data = json.load(f)
             return GameState.from_dict(state_data)
-    except Exception:
+    except Exception as e:
+        logging.error(f"Error reading state file: {e}")
         return None
 
 def encode_path(path: str) -> str:
@@ -58,8 +61,8 @@ def get_latest_version(game_id: int) -> dict:
                     "content_id": app.get("main_content_id", 0),
                     "running_process_name": app.get("running_process_name", "")
                 }
-    except Exception:
-        pass
+    except Exception as e:
+        logging.error(f"Failed to get latest version: {e}")
     return None
 
 def get_downloadable_id(content_id: int, version_code: str) -> int:
@@ -72,8 +75,8 @@ def get_downloadable_id(content_id: int, version_code: str) -> int:
         if data is not None and data.get("code") == 200:
             downloadable_id = data.get("data", {}).get("downloadable_id", default_id)
             return downloadable_id if downloadable_id is not None else default_id
-    except Exception:
-        pass
+    except Exception as e:
+        logging.error(f"Failed to get downloadable ID: {e}")
     return default_id
 
 def check_resource(base_path: str, game_id: int, content_id: int, progress_callback=None) -> list[str]:
@@ -95,8 +98,11 @@ def check_resource(base_path: str, game_id: int, content_id: int, progress_callb
         target = Path(base_path) / Path(name)
         if not target.exists(): return name
         try:
+            hasher = hashlib.md5()
             with open(target, 'rb') as f:
-                file_md5 = hashlib.md5(f.read()).hexdigest()
+                for chunk in iter(lambda: f.read(8192), b""):
+                    hasher.update(chunk)
+            file_md5 = hasher.hexdigest()
             if file_md5 != md5: return name
         except Exception: return name
         return None
@@ -122,11 +128,30 @@ def check_resource(base_path: str, game_id: int, content_id: int, progress_callb
                 if progress_callback and (i + 1) % 10 == 0:
                     progress_callback(i + 1, total)
     except Exception as e:
-        print(f"Error reading state file: {e}")
+        logging.error(f"Error reading state file: {e}")
 
     return repair_file_list
 
 def patch_login(base_path: str):
-    target_path = Path(base_path) / "netease.data"
-    with open(target_path, 'wb') as f:
-        f.write(base64.b64decode(LOGIN_DATA))
+    try:
+        target_path = Path(base_path) / "netease.data"
+        with open(target_path, 'wb') as f:
+            f.write(base64.b64decode(LOGIN_DATA))
+        logging.info(f"Patched login data: {target_path}")
+    except Exception as e:
+        logging.error(f"Failed to patch login data: {e}")
+        
+def patch_dll(source_path: Path, target_dir: Path):
+    try:
+        target_path = target_dir / source_path.name
+        if target_path.exists():
+            hash_source = hashlib.md5(source_path.read_bytes()).hexdigest()
+            hash_target = hashlib.md5(target_path.read_bytes()).hexdigest()
+            if hash_source == hash_target:
+                return
+            else:
+                target_path.unlink()
+        shutil.copy2(source_path, target_path)
+        logging.info(f"Patched DLL: {target_path}")
+    except Exception as e:
+        logging.error(f"Failed to patch DLL: {e}")

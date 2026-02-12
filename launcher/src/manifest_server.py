@@ -1,3 +1,5 @@
+import logging
+
 from flask import Flask, jsonify, request
 from utils import request_get
 
@@ -20,10 +22,10 @@ def get_manifest():
         manifest_data_data = manifest_data.get("data", {})
         target_downloadable_id = manifest_data_data.get("downloadable_id")
         if target_downloadable_id is not None and target_downloadable_id == downloadable_id:
-            print(f"[*] Found manifest for version {target_version}")
+            logging.info(f"Found manifest for version {target_version}")
             return jsonify(manifest_data), 200
     else:
-        print(f"[!] No manifest found for app_content_id {app_content_id}")
+        logging.error(f"No manifest found for app_content_id {app_content_id}")
         return jsonify({
             "code": 500,
             "msg": "Failed to get manifest URL"
@@ -37,17 +39,17 @@ def get_manifest():
     }
     manifest_data = request_get(manifest_url_api, params=params)
     if manifest_data is not None and manifest_data.get("code") == 200:
-        print(f"[*] Found manifest for downloadable_id {downloadable_id}")
+        logging.info(f"Found manifest for downloadable_id {downloadable_id}")
         return jsonify(manifest_data), 200
     
     # format 3: fallback to construct manifest URL
     if not downloadable_id:
-        print("[!] Missing downloadable_id for fallback manifest URL construction")
+        logging.error("Missing downloadable_id for fallback manifest URL construction")
         return jsonify({
             "code": 500,
             "msg": "Failed to get manifest URL"
         }), 200
-    print(f"[*] Fallback to construct manifest URL for downloadable_id {downloadable_id}")
+    logging.info(f"Fallback to construct manifest URL for downloadable_id {downloadable_id}")
     manifest_template["data"]["manifest_url"] = f"https://x19-h.gdl.netease.com/a50_package__v2_i_81_{downloadable_id}/v2_569_{downloadable_id}.manifest"
     manifest_template["data"]["downloadable_id"] = downloadable_id
     return jsonify(manifest_template), 200
