@@ -9,7 +9,7 @@ from entity import BaseEntity
 class AppConfig(BaseEntity):
     silentMode: bool = False
     autoUpdate: bool = False
-    allowMultipleInstances: bool = False
+    unlimitLaunchGame: bool = False
 
 @dataclass
 class DownloadConfig(BaseEntity):

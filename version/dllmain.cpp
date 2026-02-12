@@ -32,6 +32,7 @@ bool IsGameProcess()
     std::string path = szFileName;
     std::transform(path.begin(), path.end(), path.begin(), ::tolower);
 
+    DBG_LOG("[Hook] Current process path: %s\n", path.c_str());
     return path.find("minecraft.windows.exe") != std::string::npos ||
         path.find("unpack_minecraft.windows.exe") != std::string::npos;
 }
@@ -135,7 +136,7 @@ void MainThread(HMODULE hModule)
 
 unsigned __stdcall ThreadWrapper(void* pContext)
 {
-    OpenConsole();
+    // OpenConsole();
     HMODULE hModule = (HMODULE)pContext;
     MainThread(hModule);
 

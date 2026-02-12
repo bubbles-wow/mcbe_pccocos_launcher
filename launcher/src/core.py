@@ -313,7 +313,7 @@ class DownloaderCore:
         self.process = None
         
     def launch_game(self):
-        if not self.app_config.allowMultipleInstances and self.is_game_running():
+        if not self.app_config.unlimitLaunchGame and self.is_game_running():
             self.log("Game instance already detected. Cannot launch multiple instances.")
             return None
 
@@ -323,8 +323,17 @@ class DownloaderCore:
         
         try:
             patch_login(self.game_config.path)
-            if self.app_config.allowMultipleInstances:
-                patch_dll(self.base_path / "bin" / "version.dll", Path(self.game_config.path))
+            dll_path = self.base_path / "bin" / "version.dll"
+            if self.app_config.unlimitLaunchGame:
+                patch_dll(dll_path, Path(self.game_config.path))
+            else:
+                try:
+                    game_dll_path = Path(self.game_config.path) / "version.dll"
+                    if game_dll_path.exists():
+                        game_dll_path.unlink()
+                except Exception as e:
+                    self.log(f"Failed to remove existing version.dll: {e}")
+                
             # We use shell=True and cwd to ensure the executable is found in the game directory
             # and that it can load its dependencies.
             self.game_process = subprocess.Popen(
