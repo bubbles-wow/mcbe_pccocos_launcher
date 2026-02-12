@@ -24,6 +24,35 @@ jobs:
         run: |
           ./init.ps1
           ./pack.ps1
+
+      - name: Build minhook
+        id: build-minhook
+        shell: pwsh
+        run: |
+          git clone https://github.com/TsudaKageyu/minhook --depth=1 .\third_party\minhook
+          cd .\third_party\minhook
+          $patchContent = @(
+            'if(MSVC)',
+            'target_compile_options(minhook PRIVATE',
+            '$<$<AND:$<C_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:/MDd>',
+            '$<$<AND:$<C_COMPILER_ID:MSVC>,$<NOT:$<CONFIG:Debug>>>:/MD>',  # 匹配 vcxproj 的 /MD
+            ')',
+            'endif()'
+          )
+          $patchFile = "CMakeLists.txt"
+          $originalContent = Get-Content $patchFile
+          $newContent = $originalContent + $patchContent
+          Set-Content -Path $patchFile -Value ($newContent -join "`n")
+
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --target minhook
+
+          $includePath = "${{ github.workspace }}\version\include"
+          $libPath = "${{ github.workspace }}\version\lib"
+          if (!(Test-Path $includePath)) { New-Item -ItemType Directory -Path $includePath }
+          if (!(Test-Path $libPath)) { New-Item -ItemType Directory -Path $libPath }
+          Copy-Item -Path "build\minhook.x64.lib" -Destination $libPath\minhook.x64.lib -Force
+          Copy-Item -Path "include"\* -Destination $includePath -Force
       
       - name: Build cpp
         id: build-cpp

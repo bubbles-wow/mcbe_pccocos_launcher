@@ -341,7 +341,7 @@ class DownloaderGUI:
         try:
             is_running = self.core.is_game_running()
             
-            if is_running:
+            if not self.app_config.allowMultipleInstances and is_running:
                 if self.launch_button['text'] != self.texts['game_running']:
                     self.launch_button.config(text=self.texts['game_running'])
                     self.set_controls_state(False)

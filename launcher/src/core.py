@@ -10,7 +10,7 @@ from pathlib import Path
 from config import ConfigWrapper
 from utils import (
     executor, get_latest_version, parse_game_state, 
-    patch_login, get_downloadable_id
+    patch_login, get_downloadable_id, patch_dll
 )
 from progress import DownloadProgress
 
@@ -313,7 +313,7 @@ class DownloaderCore:
         self.process = None
         
     def launch_game(self):
-        if self.is_game_running():
+        if not self.app_config.allowMultipleInstances and self.is_game_running():
             self.log("Game instance already detected. Cannot launch multiple instances.")
             return None
 
@@ -323,10 +323,12 @@ class DownloaderCore:
         
         try:
             patch_login(self.game_config.path)
+            if self.app_config.allowMultipleInstances:
+                patch_dll(self.base_path / "bin" / "version.dll", Path(self.game_config.path))
             # We use shell=True and cwd to ensure the executable is found in the game directory
             # and that it can load its dependencies.
             self.game_process = subprocess.Popen(
-                f'"{self.game_config.running_process}" --start_from_launcher=1', 
+                f'"{self.game_config.running_process}" --start_from_launcher=1',
                 shell=True, 
                 cwd=self.game_config.path
             )
