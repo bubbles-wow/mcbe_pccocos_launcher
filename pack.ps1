@@ -138,8 +138,8 @@ try {
     Write-Error "Failed to compile project Python files."
     exit 1
 }
-$mainPycPath = Join-Path -Path $srcPath -ChildPath "main.pyc"
-Move-Item $mainPycPath -Destination $PY_ROOT -Force
+$launcherPycPath = Join-Path -Path $srcPath -ChildPath "launcher.pyc"
+Move-Item $launcherPycPath -Destination $PY_ROOT -Force
 
 # Remove all __pycache__ folders in Lib
 Write-Host "Removing __pycache__ from standard library..." -ForegroundColor Yellow

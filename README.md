@@ -60,5 +60,3 @@ mcbe基岩互通版启动器
 ## 许可证
 [GNU General Public License v3.0 (GPL-3.0)](LICENSE)
 
-## 鸣谢
-- [LobbyMaster](https://www.lobbymaster.cn/): 使用了部分文件实现无发烧平台登录功能

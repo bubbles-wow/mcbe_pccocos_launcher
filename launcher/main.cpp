@@ -45,7 +45,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     const char* script = "import importlib.util; "
         "import sys; "
-        "spec = importlib.util.spec_from_file_location('__main__', 'main.pyc'); "
+        "spec = importlib.util.spec_from_file_location('__main__', 'launcher.pyc'); "
         "module = importlib.util.module_from_spec(spec); "
         "spec.loader.exec_module(module);";
 
@@ -58,7 +58,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
         }
     }
     
-    PyObject* pModule = PyImport_ImportModule("main");
+    PyObject* pModule = PyImport_ImportModule("launcher");
     if (pModule != NULL) {
         PyObject* pFunc = PyObject_GetAttrString(pModule, "main");
 
